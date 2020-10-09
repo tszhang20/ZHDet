@@ -103,7 +103,6 @@ if __name__ == "__main__":
         label = COCO_CLASSES[boxes[i][-1]]
         # 边界框并转换
         box = np.array(boxes[i][:4] * scale, np.int)
-        print(box)
         # 显示内容
         cv2.putText(im, label, (box[0], box[1]), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), thickness=1)
         cv2.rectangle(im, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), thickness=1)
