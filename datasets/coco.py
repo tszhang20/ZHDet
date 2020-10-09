@@ -45,8 +45,10 @@ class VOCAnnotationTransform:
                 # 获得类别id
                 label_idx = self.label_map[obj["category_id"]] - 1
                 # 坐标归一化
+                print("scale_before", bbox)
                 final_box = list(np.array([bbox[0], bbox[1], bbox[0] + bbox[2], bbox[1] + bbox[3]]) / scale)
                 final_box.append(label_idx)
+                print(final_box)
                 res += [final_box]
             else:
                 print("No bbox found for object", obj)
@@ -86,7 +88,24 @@ class COCODetection(Dataset):
 
 
 if __name__ == "__main__":
+    # 获取COCODetection对象
     datasets = COCODetection(root="../COCO2017/val2017",
                              ann_path="../COCO2017/annotations/instances_val2017.json")
-    print(datasets[0])
-    print(len(datasets))
+    # 获取图片
+    im = datasets[0][0].permute(1, 2, 0).numpy()
+    # 图片信息
+    w, h, _ = im.shape
+    scale = np.array([h, w, h, w])
+    # 标注框
+    boxes = datasets[0][1]
+    for i in range(len(boxes)):
+        # 类别
+        label = COCO_CLASSES[boxes[i][-1]]
+        # 边界框并转换
+        box = np.array(boxes[i][:4] * scale, np.int)
+        print(box)
+        # 显示内容
+        cv2.putText(im, label, (box[0], box[1]), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), thickness=1)
+        cv2.rectangle(im, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), thickness=1)
+    cv2.imshow("image", im)
+    cv2.waitKey(0)
